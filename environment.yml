@@ -1,0 +1,19 @@
+name: businesspilot-ai
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy
+  - pandas
+  - scikit-learn
+  - pydantic
+  - python-dotenv
+  - pip:
+      - fastapi
+      - uvicorn[standard]
+      - shap
+      - google-cloud-aiplatform
+      - openai
+      - pytest
+      - pytest-cov

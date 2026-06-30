@@ -1,0 +1,22 @@
+# Python
+env/
+*.pyc
+__pycache__/
+.python-version
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+dist/
+build/
+
+# Config and secrets
+.env

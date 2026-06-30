@@ -1,0 +1,29 @@
+[project]
+name = "ai-agents-vibe-capstone"
+version = "0.1.0"
+description = "Enterprise AI agent platform for churn prediction and retention recommendation."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [ { name = "jcdumlao14" } ]
+classifiers = [
+  "Programming Language :: Python :: 3.11",
+  "Operating System :: OS Independent",
+  "License :: OSI Approved :: MIT License"
+]
+dependencies = [
+  "numpy",
+  "pandas",
+  "scikit-learn",
+  "shap",
+  "fastapi",
+  "uvicorn[standard]",
+  "pydantic",
+  "python-dotenv",
+  "google-cloud-aiplatform",
+  "openai"
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

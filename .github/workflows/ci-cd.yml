@@ -1,0 +1,73 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verify Python syntax
+        run: |
+          python -m py_compile src/services/api.py src/agents/main_agent.py src/agents/memory_agent.py src/agents/planner_agent.py
+
+      - name: Run tests
+        run: pytest --cov=.
+
+  deploy-cloud-run:
+    name: Deploy to Google Cloud Run
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      CLOUD_RUN_SERVICE: ${{ secrets.CLOUD_RUN_SERVICE }}
+      CLOUD_RUN_REGION: ${{ secrets.CLOUD_RUN_REGION }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GOOGLE_REGION: ${{ secrets.GOOGLE_REGION }}
+      GOOGLE_ADK_ENDPOINT_ID: ${{ secrets.GOOGLE_ADK_ENDPOINT_ID }}
+      USE_GOOGLE_ADK: ${{ secrets.USE_GOOGLE_ADK }}
+      GOOGLE_ANTIGRAVITY_ENDPOINT: ${{ secrets.GOOGLE_ANTIGRAVITY_ENDPOINT }}
+      GOOGLE_ANTIGRAVITY_API_KEY: ${{ secrets.GOOGLE_ANTIGRAVITY_API_KEY }}
+      USE_GOOGLE_ANTIGRAVITY: ${{ secrets.USE_GOOGLE_ANTIGRAVITY }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          export_default_credentials: true
+
+      - name: Build Docker image
+        run: |
+          gcloud builds submit --tag "gcr.io/${GCP_PROJECT_ID}/${CLOUD_RUN_SERVICE}:latest" .
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "${CLOUD_RUN_SERVICE}" \
+            --image "gcr.io/${GCP_PROJECT_ID}/${CLOUD_RUN_SERVICE}:latest" \
+            --region "${CLOUD_RUN_REGION}" \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "OPENAI_API_KEY=${OPENAI_API_KEY},PROJECT_ID=${GCP_PROJECT_ID},GOOGLE_REGION=${GOOGLE_REGION},GOOGLE_ADK_ENDPOINT_ID=${GOOGLE_ADK_ENDPOINT_ID},USE_GOOGLE_ADK=${USE_GOOGLE_ADK},GOOGLE_ANTIGRAVITY_ENDPOINT=${GOOGLE_ANTIGRAVITY_ENDPOINT},GOOGLE_ANTIGRAVITY_API_KEY=${GOOGLE_ANTIGRAVITY_API_KEY},USE_GOOGLE_ANTIGRAVITY=${USE_GOOGLE_ANTIGRAVITY}"
