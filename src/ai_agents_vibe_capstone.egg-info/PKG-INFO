@@ -1,3 +1,28 @@
+Metadata-Version: 2.4
+Name: ai-agents-vibe-capstone
+Version: 0.1.0
+Summary: Enterprise AI agent platform for churn prediction and retention recommendation.
+Author: jcdumlao14
+License: MIT
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: shap
+Requires-Dist: fastapi
+Requires-Dist: uvicorn[standard]
+Requires-Dist: pydantic
+Requires-Dist: pydantic-settings
+Requires-Dist: python-dotenv
+Requires-Dist: google-cloud-aiplatform
+Requires-Dist: openai
+Dynamic: license-file
+
 # BusinessPilot AI
 
 BusinessPilot AI is an enterprise-style multi-agent system for customer churn prediction, retention planning, and business workflow automation. The repository combines a FastAPI service, orchestration agents, memory support, and evaluation logic into a practical capstone implementation that can be extended for real-world customer success workflows.
